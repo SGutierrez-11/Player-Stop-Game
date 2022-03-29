@@ -20,163 +20,143 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 
-public class GameUI implements Initializable{
-	
-	//------------------VENTANA 1
+public class GameUI implements Initializable {
 
-    @FXML
-    private Label title;
+	// ------------------VENTANA 1
+	@FXML
+	private AnchorPane anchorPane;
 
-    @FXML
-    private Button stopBtn;
+	@FXML
+	private Label title;
 
-    @FXML
-    private TextField nameAnswer;
+	@FXML
+	private Button stopBtn;
 
-    @FXML
-    private TextField animalAnswer;
+	@FXML
+	private TextField nameAnswer;
 
-    @FXML
-    private TextField locationAnswer;
+	@FXML
+	private TextField animalAnswer;
 
-    @FXML
-    private TextField objectAnswer;
-    
-    
-    
-    
-    
-    
-    //---------------------------VENTANA2
-    
-    @FXML
-    private Label ownNameResult;
+	@FXML
+	private TextField locationAnswer;
 
-    @FXML
-    private Label opponentNameResult;
+	@FXML
+	private TextField objectAnswer;
 
-    @FXML
-    private Label ownAnimalResult;
+	// ---------------------------VENTANA2
 
-    @FXML
-    private Label opponentAnimalResult;
+	@FXML
+	private Label ownNameResult;
 
-    @FXML
-    private Label ownLocationResult;
+	@FXML
+	private Label opponentNameResult;
 
-    @FXML
-    private Label opponentLocationResult;
+	@FXML
+	private Label ownAnimalResult;
 
-    @FXML
-    private Label ownObjectResult;
+	@FXML
+	private Label opponentAnimalResult;
 
-    @FXML
-    private Label opponentObjectResult;
+	@FXML
+	private Label ownLocationResult;
 
-    @FXML
-    private Button finishBtn;
-    
-    //----------------------------------------------------------
-    
-	
+	@FXML
+	private Label opponentLocationResult;
+
+	@FXML
+	private Label ownObjectResult;
+
+	@FXML
+	private Label opponentObjectResult;
+
+	@FXML
+	private Button finishBtn;
+
+	// ----------------------------------------------------------
+
 	private BufferedReader reader;
 	private BufferedWriter writer;
-	
 
-	/*@Override
-	public void run() {
-		try {
-			writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
-			while(true) {
-				String line = reader.readLine();
-				System.out.println(line);
-				listener.onSend(line);
-			}
-			
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}*/
-    
+	/*
+	 * @Override public void run() { try { writer = new BufferedWriter(new
+	 * OutputStreamWriter(socket.getOutputStream())); reader = new
+	 * BufferedReader(new InputStreamReader(socket.getInputStream()));
+	 * 
+	 * while(true) { String line = reader.readLine(); System.out.println(line);
+	 * listener.onSend(line); }
+	 * 
+	 * } catch (IOException ex) { ex.printStackTrace(); } }
+	 */
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		new Thread(
-				()->{
-		try {
-			Socket socket = new Socket("192.168.0.103",6000);
-			
-			
-			writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
-			while(true) {
-				String line = reader.readLine();
-				System.out.println("Recibido: "+line);
-				if(line=="starts") {
-					FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("VentanaA.fxml"));
-					fxmlLoader.setController(this);
-				}else if(line=="finish") {
-					String name = nameAnswer.getText();
-					String animal = animalAnswer.getText();
-					String country = locationAnswer.getText();
-					String thing = objectAnswer.getText();
-					
-					writer.write("*"+name+":"+animal+":"+country+":"+thing+"\n");
-					writer.flush();						
-				}
-			}
-		}catch (IOException e) {
-			e.printStackTrace();
-		}
-				}
-			).start();
-		
-		Scanner sc = new Scanner(System.in);
-		while(true) {
-			String line = sc.nextLine();
-			if(writer!=null) {
-				new Thread(()->{
-					try {
-						writer.write(line+"\n");
+		new Thread(() -> {
+			try {
+				Socket socket = new Socket("127.30.55.138", 6000);
+
+				writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+				while (true) {
+					String line = reader.readLine();
+					System.out.println("Recibido: " + line);
+					if (line.equals("start")) {
+						Platform.runLater(()->{
+							
+								FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Ventana1.fxml"));
+						    	fxmlLoader.setController(this);
+						    	
+						    	anchorPane.getChildren();
+								
+						    	
+							
+						});
+						
+					} else if (line.equals("finish")) {
+						String name = nameAnswer.getText();
+						String animal = animalAnswer.getText();
+						String country = locationAnswer.getText();
+						String thing = objectAnswer.getText();
+
+						writer.write("*" + name + ":" + animal + ":" + country + ":" + thing + "\n");
 						writer.flush();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
-					
-				}).start();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			
-		}
+		}).start();
+
 	}
 	
-	
+	public void changeScreen() throws IOException{
+				
+			
+		
+	}
+
 	@FXML
 	public void OnStopBtn(ActionEvent event) throws IOException {
 		String name = nameAnswer.getText();
 		String animal = animalAnswer.getText();
 		String country = locationAnswer.getText();
 		String thing = objectAnswer.getText();
-		
-		if(name!="" && name!=null &&
-				animal!="" && animal!=null &&
-				country!="" && country!=null &&
-				thing!="" && thing!=null) {
-			writer.write(":"+name+":"+animal+":"+country+":"+thing+"\n");
-			writer.flush();
-			
-		}
-		
-    }
-    
-	@FXML
-    public void OnFinishBtn(ActionEvent event) {
 
-    }
-    
-	
+		if (name != "" && name != null && animal != "" && animal != null && country != "" && country != null
+				&& thing != "" && thing != null) {
+			writer.write(":" + name + ":" + animal + ":" + country + ":" + thing + "\n");
+			writer.flush();
+
+		}
+
+	}
+
+	@FXML
+	public void OnFinishBtn(ActionEvent event) {
+
+	}
+
 }
