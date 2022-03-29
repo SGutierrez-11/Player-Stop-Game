@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 import java.util.UUID;
 
 import javafx.application.Platform;
@@ -78,17 +79,10 @@ public class GameUI implements Initializable{
     
     //----------------------------------------------------------
     
-    private Socket socket;
-	private String id;
 	
 	private BufferedReader reader;
 	private BufferedWriter writer;
 	
-	public GameUI(Socket socket) {
-		this.socket = socket;
-		id = UUID.randomUUID().toString();
-
-	}
 
 	/*@Override
 	public void run() {
@@ -110,31 +104,59 @@ public class GameUI implements Initializable{
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		new Thread(() -> {
-			try {
-				writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				while (true) {
-					String line = reader.readLine();
-					if(line=="start") {
-						FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("VentanaA.fxml"));
-						 fxmlLoader.setController(this);
+		new Thread(
+				()->{
+		try {
+			Socket socket = new Socket("192.168.0.103",6000);
+			
+			
+			writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			
+			while(true) {
+				String line = reader.readLine();
+				System.out.println("Recibido: "+line);
+				if(line=="starts") {
+					FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("VentanaA.fxml"));
+					fxmlLoader.setController(this);
+				}else if(line=="finish") {
+					String name = nameAnswer.getText();
+					String animal = animalAnswer.getText();
+					String country = locationAnswer.getText();
+					String thing = objectAnswer.getText();
+					
+					writer.write("*"+name+":"+animal+":"+country+":"+thing+"\n");
+					writer.flush();						
+				}
+			}
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
+				}
+			).start();
+		
+		Scanner sc = new Scanner(System.in);
+		while(true) {
+			String line = sc.nextLine();
+			if(writer!=null) {
+				new Thread(()->{
+					try {
+						writer.write(line+"\n");
+						writer.flush();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 					
-					
-				}
-
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				}).start();
 			}
-		}).start();
-		
+			
+		}
 	}
 	
 	
 	@FXML
-	public void OnStopBtn(ActionEvent event) {
+	public void OnStopBtn(ActionEvent event) throws IOException {
 		String name = nameAnswer.getText();
 		String animal = animalAnswer.getText();
 		String country = locationAnswer.getText();
@@ -144,6 +166,9 @@ public class GameUI implements Initializable{
 				animal!="" && animal!=null &&
 				country!="" && country!=null &&
 				thing!="" && thing!=null) {
+			writer.write(":"+name+":"+animal+":"+country+":"+thing+"\n");
+			writer.flush();
+			
 		}
 		
     }
