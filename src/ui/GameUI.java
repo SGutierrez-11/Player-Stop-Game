@@ -95,7 +95,7 @@ public class GameUI implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		new Thread(() -> {
 			try {
-				Socket socket = new Socket("127.30.55.138", 6000);
+				Socket socket = new Socket("192.168.0.103", 6000);
 
 				writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 				BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -105,11 +105,17 @@ public class GameUI implements Initializable {
 					System.out.println("Recibido: " + line);
 					if (line.equals("start")) {
 						Platform.runLater(()->{
-							
+								title.setText("Letra: "+String.valueOf(line.charAt(5)));
 								FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Ventana1.fxml"));
 						    	fxmlLoader.setController(this);
+						    	try {
+									Parent p = fxmlLoader.load();
+									anchorPane.getChildren().add(p);
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 						    	
-						    	anchorPane.getChildren();
 								
 						    	
 							
