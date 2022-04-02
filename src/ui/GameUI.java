@@ -99,15 +99,17 @@ public class GameUI implements Starting, MessageListener{
 	 * } catch (IOException ex) { ex.printStackTrace(); } }
 	 */
 	
+	
+	
 	private String msg;
 	
 	@Override
 	public void initialize() {
 		
 			new Thread(()->{	
-				Socket socket;
+				
 					try {
-						socket = new Socket("127.0.0.1", 6000);
+						Socket socket = new Socket("127.0.0.1", 6000);
 						s = Session.getS(socket);
 						System.out.println(s);
 						

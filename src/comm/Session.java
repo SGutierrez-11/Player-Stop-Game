@@ -53,7 +53,7 @@ public class Session{
 	public void readLine() {
 		
 		
-		Platform.runLater(()->{
+		new Thread(()->{
 		String m="";
 		try {
 			m = reader.readLine();
@@ -62,7 +62,8 @@ public class Session{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		});
+		}).start();
+		
 	}
 	
 	public void writeLine(String msg) {
